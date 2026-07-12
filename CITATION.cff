@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software or course materials, please cite:"
+title: "Simulation Without a Black Box: Discrete-Event Modeling and Analysis for the AI Era"
+authors:
+  - family-names: Li
+    given-names: Xueping
+    affiliation: University of Tennessee, Knoxville
+version: 1.0.0
+date-released: 2026-05-21
+repository-code: "https://github.com/iLab-UTK/simdes-course"
+license: MIT
+keywords:
+  - discrete-event simulation
+  - SimPy
+  - Python
+  - operations research
+  - teaching materials
+  - reinforcement learning

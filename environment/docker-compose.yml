@@ -1,0 +1,33 @@
+version: "3.9"
+
+# Usage:
+#   docker compose up jupyter          → start JupyterLab at http://localhost:8888
+#   docker compose run --rm simdes pytest  → run tests inside container
+
+services:
+  jupyter:
+    build:
+      context: ..
+      dockerfile: environment/Dockerfile
+    image: simdes-jupyter:latest
+    container_name: simdes_jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      # Mount repo root so edits on the host are immediately visible in JupyterLab
+      - ..:/workspace
+    working_dir: /workspace
+    environment:
+      - PYTHONPATH=/workspace/simdes
+    restart: unless-stopped
+
+  simdes:
+    # Lightweight service for running tests without starting JupyterLab
+    image: simdes-jupyter:latest
+    container_name: simdes_test
+    volumes:
+      - ..:/workspace
+    working_dir: /workspace
+    environment:
+      - PYTHONPATH=/workspace/simdes
+    command: ["pytest", "simdes/tests/", "-v", "--cov=simdes", "--cov-report=term-missing"]

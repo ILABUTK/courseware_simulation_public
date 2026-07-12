@@ -1,0 +1,9 @@
+from scipy.optimize import minimize
+
+result = minimize(
+    lambda x: inventory_cost(x, n_reps=10, seed_base=42),
+    x0=[30, 90],
+    method='Nelder-Mead',
+    options={'xatol': 1.0, 'fatol': 0.5, 'maxiter': 200}
+)
+print(result)

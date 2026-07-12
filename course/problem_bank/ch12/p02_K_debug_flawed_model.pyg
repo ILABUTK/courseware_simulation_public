@@ -1,0 +1,28 @@
+import simpy
+import numpy as np
+
+def flawed_mm1(arrival_rate, service_rate, sim_time=50_000, seed=0):
+    rng = np.random.default_rng(seed)
+    env = simpy.Environment()
+    server = simpy.Resource(env, capacity=1)
+    waits = []
+
+    def customer():
+        arrival = env.now
+        with server.request() as req:
+            yield req
+            # Bug may be hiding here or nearby
+            svc = rng.exponential(service_rate)   # Bug 1
+            yield env.timeout(svc)
+        waits.append(env.now - arrival)           # Bug 2: records W, not Wq
+
+    def arrivals():
+        while True:
+            iat = rng.exponential(arrival_rate)   # Bug 3
+            yield env.timeout(iat)
+            env.process(customer())
+
+    env.process(arrivals())
+    env.run(until=sim_time)
+    return {'Wq': np.mean(waits), 'utilization': server.count / sim_time,
+            'n_served': len(waits)}

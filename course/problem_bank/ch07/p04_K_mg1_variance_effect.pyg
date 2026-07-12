@@ -1,0 +1,2 @@
+def mg1_sim(arrival_rate, service_time_fn, sim_time=500_000, seed=0) -> dict:
+    ...  # service_time_fn(rng) -> float
