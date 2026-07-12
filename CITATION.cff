@@ -5,10 +5,12 @@ authors:
   - family-names: Li
     given-names: Xueping
     affiliation: University of Tennessee, Knoxville
-version: 1.0.0
-date-released: 2026-05-21
-repository-code: "https://github.com/iLab-UTK/simdes-course"
-license: MIT
+version: 0.1.1
+date-released: 2026-07-12
+repository-code: "https://github.com/ILABUTK/courseware_simulation_public"
+license:
+  - CC-BY-NC-SA-4.0
+  - MIT
 keywords:
   - discrete-event simulation
   - SimPy
