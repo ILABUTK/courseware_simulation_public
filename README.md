@@ -12,6 +12,13 @@ learning discrete-event simulation (DES) with Python and SimPy.
 
 Everything here is free to read, run, and share under the [CC BY-NC-SA 4.0](LICENSE) license.
 
+<p align="center">
+  <a href="https://ilabutk.github.io/courseware_simulation_public/">
+    <strong>🚀 Live Demo: EP01 Emergency Department Simulation</strong>
+  </a>
+  &nbsp;— interactive 3D dashboard running in your browser.
+</p>
+
 ---
 
 ## For Instructors
