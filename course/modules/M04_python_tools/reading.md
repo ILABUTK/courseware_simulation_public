@@ -6,6 +6,7 @@
 
 1. Book Chapter 6: *Python Tools for Simulation*
 2. SimPy documentation — "SimPy in 10 Minutes" and "Core Concepts" (processes, resources, environments)
+3. Book Appendix G: *Tools for Simulation Work*, the sections on Python in the dev container (uv, `# %%` cells, debugger) and on tests and continuous integration; the *Tooling Cheat Sheet* (course handouts) has the commands on two pages
 
 ## Recommended External Reading
 

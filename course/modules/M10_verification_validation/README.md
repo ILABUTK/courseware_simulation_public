@@ -1,7 +1,9 @@
 # Module M10 — Verification and Validation
 
+<img src="preview.png" alt="A slide from the M10 live lecture, with a simulation model running" width="70%">
+
 **Book chapters**: Ch. 12 (V&V)
-**Lectures**: L33–L36 | **Tier**: Intermediate
+**Lectures**: L24, plus L25 (Ship; 2027 numbering; Beamer decks L33–L35 are the content sources) | **Tier**: Intermediate
 
 ## Learning Objectives
 1. Distinguish verification, validation, and credibility.
@@ -22,10 +24,13 @@
 | Item | File |
 |---|---|
 | Slides L33–L36 | `slides/L33_verification_workflow.tex`, `slides/L34_extreme_conditions.tex`, `slides/L35_validation_evidence.tex`, `slides/L36_credibility_documentation.tex` |
+| Live deck L24 | `live/L24_verification_validation/`: V&V vocabulary, the Columbia Crater story, face validity, model vs clinic records with an interval and a tolerance, sensitivity to an assumption (`bash cli.sh lecture dev L24`) |
+| Live deck L25 | `live/L25_shipping_product/`: the validated model behind an API, showing uncertainty, the dev container and `docker compose up --build`, reviewing an AI diff, deployment; reading pointer to M11–M12 (`bash cli.sh lecture dev L25`) |
+| Code (VS Code, `# %%` cells) | `code/l24_validation.py`, `code/l25_ship.py`, each with `test_*.py` and `make_*_data.py` (see `code/README.md`) |
 | Debug notebook | `notebooks/L33_verification_debug.ipynb` |
-| Midterm V&V addendum | `assignment/midterm_vv_addendum.md` |
+| Project | Milestone P6 (validation and limitations): `course/assignments/project_milestones.pdf` |
 
 ## Deliverables
 - Completed L33 debug notebook with a corrected model and short explanation of each defect found.
-- Midterm project V&V section using the checklist in `assignment/midterm_vv_addendum.md`.
+- Project milestone P6: validation evidence and limitations (`course/assignments/project_milestones.pdf`).
 - At least one verification test that can be rerun by a grader.

@@ -10,7 +10,7 @@ Welcome! This is the **public companion repository** for the open textbook
 *Simulation Without a Black Box* — a free, code-first course for teaching and
 learning discrete-event simulation (DES) with Python and SimPy.
 
-Everything here is free to read, run, and share under the [CC BY-NC-SA 4.0](LICENSE) license.
+Everything here is free to read and run. The licenses differ by part: see [License](#license).
 
 <p align="center">
   <a href="https://ilabutk.github.io/courseware_simulation_public/">
@@ -44,50 +44,46 @@ course. The instructor-only materials add the tools to teach, customize, and ass
 
 | What | Details |
 |---|---|
-| 📖 **Textbook PDF** | 15 chapters — fully compiled, free to read |
-| 📊 **Slide decks** | 41 lecture slide PDFs — ready to present or study from |
-| 📓 **Jupyter notebooks** | 46 code-first notebooks — run them, modify them, learn by doing |
-| 📝 **Assignments** | 10 assignment/problem-set PDFs — problem statements only (no solutions here) |
-| 🧩 **Problem bank** | 121 problems across 15 chapters — conceptual, analytical, trace, coding, and design |
-| 🏥 **Case studies** | Outpatient clinic and cargo terminal — 5 phases each, building from first principles |
-| 💻 **`simdes` Python package** | Queueing, inventory, clinic, and terminal models on SimPy — install with `pip install -e simdes/` |
-| 🐳 **Docker environment** | One command starts JupyterLab with all dependencies pinned |
-| 📋 **Syllabus** | Course syllabus and week-by-week schedule |
-| 🚀 **Capstone showcase** | EP01: complete example with SimPy model, report, and interactive dashboard |
+| 📖 **Textbook PDF** | 15 chapters, free to read |
+| 🖥️ **Lecture handouts** | PDFs of the interactive lectures L01–L25 (`course/modules/*/live/`) |
+| 🧪 **Lecture code** | The code built in class, with tests (`course/modules/*/code/`) |
+| 📝 **Assignments** | HW-00–06 and the team project (P1–P7): statements only |
+| 🧩 **Problem bank** | 48 problems, including 12 *critique-the-AI* problems, and 27 open-ended capstone problems |
+| 🚑 **Showcase** | EP01, an emergency department study as a product: model, decision memo, technical report, infographic and a [live app](https://ilabutk.github.io/courseware_simulation_public/) |
+| 🏥 **Case studies** | Outpatient clinic and cargo terminal |
+| 💻 **`simdes` Python package** | Queueing, inventory, clinic and terminal models on SimPy, with analysis tools and event traces |
+| 🏗️ **Project template** | Start your own study: [courseware_simulation_project_template](https://github.com/ilabutk/courseware_simulation_project_template) |
+| 📋 **Syllabus** | Spring 2027 syllabus and lecture schedule |
+
+**During a running course** (Spring 2027: January to May), lecture handouts, lecture code,
+assignments and data files appear here as the course reaches them. Everything is here after the
+last class.
+
+Older slide PDFs and some Jupyter notebooks remain in the module folders as extra reading.
 
 ---
 
 ## Quick start
 
-### 1. Clone and enter
+You need [Docker Desktop](https://www.docker.com/products/docker-desktop/) and
+[VS Code](https://code.visualstudio.com/) with the Dev Containers extension (or use
+GitHub Codespaces in the browser).
 
 ```bash
 git clone https://github.com/ILABUTK/courseware_simulation_public.git
-cd courseware_simulation_public
 ```
 
-### 2. Start JupyterLab with Docker (recommended)
+Open the folder in VS Code and choose **Reopen in Container**. You get Python with
+`simdes` installed. Then, for example:
 
 ```bash
-docker compose -f environment/docker-compose.yml up jupyter
-# Open http://localhost:8888 in your browser
+cd course/modules/M05_simpy_queues/code
+python -m pytest
 ```
 
-The Docker image includes Python 3.10+, SimPy 4.1+, `simdes`, JupyterLab, NumPy,
-SciPy, Pandas, Matplotlib, and Gymnasium — all version-pinned. No "works on my
-machine" problems.
+Course code is in `.py` files with `# %%` cells: run them cell by cell in VS Code.
 
-### 3. Or use a local Python environment
-
-```bash
-python -m venv .venv
-source .venv/bin/activate          # .venv\Scripts\activate on Windows
-pip install -r environment/requirements.txt
-pip install -e simdes/
-jupyter lab
-```
-
-Requires Python 3.10+.
+To start your own simulation study, use the project template linked above.
 
 ---
 
@@ -95,37 +91,33 @@ Requires Python 3.10+.
 
 ```
 courseware_simulation_public/
-├── README.md                    # You are here
-├── LICENSE                      # CC BY-NC-SA 4.0
-├── CITATION.cff                 # How to cite this work
-│
-├── book/
-│   ├── simulation-without-a-black-box.pdf   # The compiled textbook
-│   └── cover.png                           # Book cover
-│
+├── book/                        # Textbook PDF
 ├── course/
-│   ├── syllabus/                # Syllabus PDFs
-│   ├── modules/                 # M01–M12: slide PDFs + Jupyter notebooks + readings
-│   ├── assignments/             # Assignment/problem-set PDFs
-│   ├── problem_bank/            # 121 problems (ch01–ch15)
-│   ├── case_studies/            # clinic/ and terminal/ (5 phases each)
+│   ├── syllabus/                # Syllabus PDF
+│   ├── modules/                 # M01–M12: lecture handouts, code, readings
+│   ├── assignments/             # Assignment statements (PDF)
+│   ├── problem_bank/            # Problem statements
+│   ├── case_studies/            # clinic/ and terminal/
 │   └── data/                    # CSV datasets
-│
-├── showcase/ep01/               # Capstone demo: model, report, dashboard app
-├── simdes/                      # Python package (pip install -e simdes/)
-└── environment/                 # Dockerfile, docker-compose.yml, pinned requirements
+├── showcase/ep01/               # Emergency department study: model, memo, report, infographic
+├── docs/                        # The EP01 live app (GitHub Pages)
+├── simdes/                      # Python package
+├── environment/                 # Dockerfile and pinned requirements
+└── .devcontainer/               # VS Code dev container
 ```
 
 ---
 
 ## How the course is organized
 
-The course has 12 modules mapped to 15 textbook chapters:
+12 modules mapped to the textbook chapters, taught as 28 lectures; the main goal is
+critical thinking, with two threads: building a product end to end, and using AI as an
+assistant and co-scientist while checking its work.
 
 | Module | Topic | Chapters |
 |---|---|---|
-| M01 | Why Simulation? | 1 |
-| M02 | Conceptual Modeling | 2–3 |
+| M01 | Why Simulation? | 1–2 |
+| M02 | Conceptual Modeling | 3 |
 | M03 | The DES Worldview | 4–5 |
 | M04 | Python Tools | 6 |
 | M05 | SimPy Queues | 7 |
@@ -137,21 +129,16 @@ The course has 12 modules mapped to 15 textbook chapters:
 | M11 | Simulation Optimization | 13 |
 | M12 | Reinforcement Learning | 14–15 |
 
-Each module includes slide PDFs, a runnable Jupyter notebook, and reading notes.
-
 ---
 
 ## How to use these materials
 
-- **Self-learners**: Start with the syllabus for the week-by-week plan, then
-  work through modules M01→M12. Read the textbook chapter, study the slides,
-  and run the notebook. Attempt the assignments and check your understanding
-  against the problem bank.
-- **Students in a course**: Your instructor will guide you through the modules
-  and assign specific problems. The notebooks are your lab — run them, break
-  them, fix them. That's how you learn.
-- **Instructors**: See the **For Instructors** section above — you'll want
-  access to the private repo for editable sources, rubrics, and solutions.
+- **Self-learners:** follow the syllabus schedule. For each lecture, read the chapter, go
+  through the handout, run the code, then try problems from the problem bank.
+- **Students in a course:** your instructor guides you through the modules and assigns
+  the work.
+- **Instructors:** see **For Instructors** above for editable sources, live decks,
+  rubrics and solutions.
 
 ---
 
@@ -172,11 +159,14 @@ agent tomorrow.
 
 ## License
 
-Course materials (text, slides, notebooks, assignments, problems) are licensed
-under [CC BY-NC-SA 4.0](LICENSE). You may share and adapt them for
-non-commercial educational use with attribution.
+Different parts have different licenses ([LICENSE](LICENSE); a LICENSE file in a folder
+applies to that folder):
 
-The `simdes` Python package is licensed separately under the [MIT License](simdes/LICENSE).
+| What | License |
+|---|---|
+| Code: `simdes`, lecture and case-study code, showcases, lecture engine, project template | [MIT](LICENSES/MIT.txt) |
+| Course materials: slides, handouts, notebooks, assignment and problem statements, data, infographics, showcase reports | [CC BY-NC-SA 4.0](LICENSES/CC-BY-NC-SA-4.0.txt): share and adapt for noncommercial use, with credit, under the same license |
+| Textbook PDF | All rights reserved: free to download, read and print for study and teaching |
 
 ---
 

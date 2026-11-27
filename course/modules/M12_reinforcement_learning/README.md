@@ -15,7 +15,7 @@
 |---|---|
 | Slides | `slides/L39_mdp_framing.tex`, `slides/L40_tabular_q_learning.tex`, `slides/L41_simpy_gym_wrapper.tex`, `slides/L42_deep_rl_training.tex` |
 | Notebooks | `notebooks/L39_mdp_framing.ipynb`, `notebooks/L40_tabular_q_learning.ipynb`, `notebooks/L41_simpy_gym_wrapper.ipynb`, `notebooks/L42_deep_rl_training.ipynb` |
-| Final project | `assignment/final_project_rl_option.md` |
+| Project extension | Optional reinforcement-learning extension of the final project (P7): `course/assignments/project_final.pdf` |
 | Reading | `reading.md` |
 
 ## Prerequisites

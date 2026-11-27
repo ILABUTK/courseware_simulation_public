@@ -38,3 +38,6 @@ pytest-cov==5.0.0
 ruff==0.4.4
 mypy==1.10.0
 black==24.4.2
+
+# grading pipeline (scripts/grading)
+pyyaml==6.0.3

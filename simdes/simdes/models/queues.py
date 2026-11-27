@@ -90,11 +90,10 @@ class MM1Queue(BaseModel):
         self._last_change_time = 0.0
         self._queue_len = 0
         self._server = simpy.Resource(env, capacity=1)
+        self._trace_station("server", "Server", capacity=1)
         env.process(self._arrival_stream(env, rng))
 
-    def _arrival_stream(
-        self, env: simpy.Environment, rng: np.random.Generator
-    ) -> Any:
+    def _arrival_stream(self, env: simpy.Environment, rng: np.random.Generator) -> Any:
         while True:
             yield env.timeout(rng.exponential(1.0 / self.arrival_rate))
             env.process(self._customer(env, rng, arrival_time=env.now))
@@ -103,10 +102,14 @@ class MM1Queue(BaseModel):
         self, env: simpy.Environment, rng: np.random.Generator, arrival_time: float
     ) -> Any:
         assert self._server is not None
+        entity = self._new_entity()
+        self._log(entity, "arrive")
+        self._log(entity, "queue", "server")
         self._update_queue_area(env.now)
         self._queue_len += 1
         with self._server.request() as req:
             yield req
+            self._log(entity, "start", "server")
             self._update_queue_area(env.now)
             self._queue_len -= 1
             wait = env.now - arrival_time
@@ -114,6 +117,8 @@ class MM1Queue(BaseModel):
             service_time = rng.exponential(1.0 / self.service_rate)
             yield env.timeout(service_time)
             self._busy_time += service_time
+            self._log(entity, "finish", "server")
+        self._log(entity, "depart")
 
     def _collect(self) -> dict[str, Any]:
         assert self._env is not None
@@ -163,11 +168,10 @@ class MMCQueue(BaseModel):
     def _build(self, env: simpy.Environment, rng: np.random.Generator) -> None:
         self._waits = []
         self._server = simpy.Resource(env, capacity=self.n_servers)
+        self._trace_station("servers", "Servers", capacity=self.n_servers)
         env.process(self._arrival_stream(env, rng))
 
-    def _arrival_stream(
-        self, env: simpy.Environment, rng: np.random.Generator
-    ) -> Any:
+    def _arrival_stream(self, env: simpy.Environment, rng: np.random.Generator) -> Any:
         while True:
             yield env.timeout(rng.exponential(1.0 / self.arrival_rate))
             env.process(self._customer(env, rng, arrival_time=env.now))
@@ -176,10 +180,16 @@ class MMCQueue(BaseModel):
         self, env: simpy.Environment, rng: np.random.Generator, arrival_time: float
     ) -> Any:
         assert self._server is not None
+        entity = self._new_entity()
+        self._log(entity, "arrive")
+        self._log(entity, "queue", "servers")
         with self._server.request() as req:
             yield req
+            self._log(entity, "start", "servers")
             self._waits.append(env.now - arrival_time)
             yield env.timeout(rng.exponential(1.0 / self.service_rate))
+            self._log(entity, "finish", "servers")
+        self._log(entity, "depart")
 
     def _collect(self) -> dict[str, Any]:
         waits = np.array(self._waits)

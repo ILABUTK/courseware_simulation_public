@@ -1,8 +1,12 @@
-"""Inventory control models: SSInventory ((s,S) policy).
+"""Inventory control models: SSInventory ((s, S) policy).
 
-The (s,S) model uses simpy.Container to track on-hand inventory.
-Demand arrives as a Poisson process with random demand sizes.
-Replenishment orders arrive after a stochastic lead time.
+Continuous review of the inventory position, with full backordering.  Demand
+arrives as a Poisson process with exponential demand sizes, and replenishment
+orders arrive after an exponential lead time (orders may cross).
+
+Versions of simdes before 0.2.1 implemented this model incorrectly (they
+ordered on on-hand stock, lost unmet demand and discarded ordered units), so
+their results should not be used.
 """
 
 from __future__ import annotations
@@ -16,22 +20,45 @@ from simdes.core.model import BaseModel
 
 
 class SSInventory(BaseModel):
-    """(s, S) continuous-review inventory model.
+    """(s, S) continuous-review inventory model with backorders.
 
-    When on-hand inventory falls to or below reorder point *s*, an order is
-    placed to bring the inventory up to order-up-to level *S*.  Orders arrive
-    after a random lead time drawn from an exponential distribution.
+    The *inventory position* (on hand + on order - backorders) is reviewed
+    after every demand.  When it is at or below the reorder point *s*, an
+    order of size ``S - position`` is placed, which brings the position back
+    to the order-up-to level *S*.  Any number of orders may be outstanding.
+
+    Demand that cannot be met from stock is backordered, and each receipt
+    fills backorders first; the rest goes on the shelf.  Every ordered unit is
+    received.  A run starts with *S* units on hand and nothing on order.
+
+    Demands and lead times use separate random streams, so two policies run
+    with the same seed see the same demands (common random numbers).
+
+    To use other distributions, subclass and override
+    :meth:`_interarrival_time`, :meth:`_demand_size` or :meth:`_lead_time`.
 
     Args:
-        reorder_point: Reorder point s (trigger an order at or below this).
+        reorder_point: Reorder point s (order when the position is at or
+            below this).
         order_up_to: Order-up-to level S (> s).
         demand_rate: Mean demand arrival rate (Poisson process).
         demand_mean: Mean demand size per arrival (exponential).
         lead_time_mean: Mean replenishment lead time (exponential).
-        holding_cost: Holding cost per unit per time.
-        backorder_cost: Backorder (shortage) cost per unit per time.
+        holding_cost: Holding cost per unit on hand per unit time.
+        backorder_cost: Backorder (shortage) cost per unit backordered per
+            unit time.
         sim_time: Simulated time horizon.
         seed: Base random seed.
+
+    Results of :meth:`run`:
+        ``avg_inventory`` and ``avg_backorder`` are time averages of the units
+        on hand and backordered over the whole horizon (no warm-up deletion).
+        ``avg_holding_cost``, ``avg_backorder_cost`` and their sum
+        ``avg_total_cost`` are costs per unit time; ordering cost is not
+        included (for a cost K per order, add ``K * n_orders / sim_time``).
+        ``n_orders`` and ``n_demand_events`` count orders placed and demands.
+        ``fill_rate`` is the fraction of demanded units met immediately from
+        stock (NaN if there was no demand).
 
     Example:
         >>> m = SSInventory(reorder_point=5, order_up_to=20, demand_rate=2.0,
@@ -63,77 +90,118 @@ class SSInventory(BaseModel):
         self.lead_time_mean = lead_time_mean
         self.holding_cost = holding_cost
         self.backorder_cost = backorder_cost
-        # Accumulators
+        self._reset_state()
+
+    # ------------------------------------------------------------------
+    # Random inputs (override to change the distributions)
+    # ------------------------------------------------------------------
+
+    def _interarrival_time(self, rng: np.random.Generator) -> float:
+        """Time to the next demand."""
+        return float(rng.exponential(1.0 / self.demand_rate))
+
+    def _demand_size(self, rng: np.random.Generator) -> float:
+        """Units asked for by one demand."""
+        return float(rng.exponential(self.demand_mean))
+
+    def _lead_time(self, rng: np.random.Generator) -> float:
+        """Lead time of one replenishment order."""
+        return float(rng.exponential(self.lead_time_mean))
+
+    # ------------------------------------------------------------------
+    # State
+    # ------------------------------------------------------------------
+
+    def _reset_state(self) -> None:
+        # Net inventory = on hand - backorders (at most one of the two is > 0).
+        self._net: float = float(self.S)
+        self._on_order: float = 0.0
+        self._outstanding: int = 0
         self._inventory_area: float = 0.0
         self._backorder_area: float = 0.0
         self._last_time: float = 0.0
         self._n_orders: int = 0
         self._n_demand_events: int = 0
-        self._container: simpy.Container | None = None
+        self._units_demanded: float = 0.0
+        self._units_filled: float = 0.0
+        self._units_ordered: float = 0.0
+        self._units_received: float = 0.0
+
+    def _position(self) -> float:
+        """Inventory position: on hand + on order - backorders."""
+        return self._net + self._on_order
+
+    def _accumulate(self, now: float) -> None:
+        """Add the area since the last change.  Call before every state change."""
+        dt = now - self._last_time
+        self._inventory_area += max(self._net, 0.0) * dt
+        self._backorder_area += max(-self._net, 0.0) * dt
+        self._last_time = now
+
+    # ------------------------------------------------------------------
+    # Processes
+    # ------------------------------------------------------------------
 
     def _build(self, env: simpy.Environment, rng: np.random.Generator) -> None:
-        self._inventory_area = 0.0
-        self._backorder_area = 0.0
-        self._last_time = 0.0
-        self._n_orders = 0
-        self._n_demand_events = 0
-        self._container = simpy.Container(env, capacity=self.S, init=self.S)
-        env.process(self._demand_process(env, rng))
-        env.process(self._review_process(env, rng))
-
-    def _accumulate(self, env: simpy.Environment) -> None:
-        """Update area accumulators between events."""
-        dt = env.now - self._last_time
-        level = self._container.level if self._container else 0.0
-        self._inventory_area += max(level, 0.0) * dt
-        self._backorder_area += max(-level, 0.0) * dt
-        self._last_time = env.now
+        self._reset_state()
+        demand_rng, lead_rng = rng.spawn(2)
+        env.process(self._demand_process(env, demand_rng, lead_rng))
 
     def _demand_process(
-        self, env: simpy.Environment, rng: np.random.Generator
+        self,
+        env: simpy.Environment,
+        demand_rng: np.random.Generator,
+        lead_rng: np.random.Generator,
     ) -> Any:
-        """Generate demand arrivals and reduce inventory."""
-        assert self._container is not None
+        """Generate demands; review the inventory position after each one."""
         while True:
-            yield env.timeout(rng.exponential(1.0 / self.demand_rate))
-            self._accumulate(env)
-            demand = rng.exponential(self.demand_mean)
-            qty = min(demand, self._container.level)
-            if qty > 0:
-                yield self._container.get(qty)
+            yield env.timeout(self._interarrival_time(demand_rng))
+            size = self._demand_size(demand_rng)
+            self._accumulate(env.now)
+            self._units_filled += min(size, max(self._net, 0.0))
+            self._units_demanded += size
+            self._net -= size  # a shortfall becomes a backorder
             self._n_demand_events += 1
+            self._review(env, lead_rng)
 
-    def _review_process(
-        self, env: simpy.Environment, rng: np.random.Generator
-    ) -> Any:
-        """Check inventory level continuously; place orders when needed."""
-        assert self._container is not None
-        order_pending = False
-        while True:
-            yield env.timeout(0.01)  # near-continuous review
-            self._accumulate(env)
-            if self._container.level <= self.s and not order_pending:
-                order_pending = True
-                self._n_orders += 1
-                order_qty = self.S - self._container.level
-                lead_time = rng.exponential(self.lead_time_mean)
-                env.process(self._receive_order(env, order_qty, lead_time))
-                order_pending = False
+    def _review(self, env: simpy.Environment, lead_rng: np.random.Generator) -> None:
+        """Order up to S if the inventory position is at or below s.
+
+        Only a demand lowers the position (a receipt leaves it unchanged), so
+        reviewing after each demand is continuous review.
+        """
+        position = self._position()
+        if position > self.s:
+            return
+        quantity = self.S - position
+        self._on_order += quantity
+        self._outstanding += 1
+        self._n_orders += 1
+        self._units_ordered += quantity
+        lead_time = self._lead_time(lead_rng)
+        env.process(self._receive_order(env, quantity, lead_time))
 
     def _receive_order(
-        self, env: simpy.Environment, qty: float, lead_time: float
+        self, env: simpy.Environment, quantity: float, lead_time: float
     ) -> Any:
-        assert self._container is not None
+        """Receive one order: backorders are filled first, the rest is stocked."""
         yield env.timeout(lead_time)
-        self._accumulate(env)
-        space = self._container.capacity - self._container.level
-        amount = min(qty, space)
-        if amount > 0:
-            yield self._container.put(amount)
+        self._accumulate(env.now)
+        self._net += quantity
+        self._units_received += quantity
+        self._outstanding -= 1
+        # Clear floating-point residue once nothing is in transit.
+        self._on_order = self._on_order - quantity if self._outstanding else 0.0
 
     def _collect(self) -> dict[str, Any]:
+        self._accumulate(self.sim_time)  # close the last interval
         avg_inv = self._inventory_area / self.sim_time
         avg_bo = self._backorder_area / self.sim_time
+        fill_rate = (
+            self._units_filled / self._units_demanded
+            if self._units_demanded > 0
+            else float("nan")
+        )
         return {
             "avg_inventory": avg_inv,
             "avg_backorder": avg_bo,
@@ -144,4 +212,5 @@ class SSInventory(BaseModel):
             ),
             "n_orders": self._n_orders,
             "n_demand_events": self._n_demand_events,
+            "fill_rate": fill_rate,
         }

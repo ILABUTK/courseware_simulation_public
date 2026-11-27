@@ -1,2 +1,0 @@
-def run_mm1(arrival_rate, service_rate, sim_time, seed=None) -> dict:
-    ...  # returns {"mean_wait_queue": ..., "utilization": ..., "n_customers": ...}

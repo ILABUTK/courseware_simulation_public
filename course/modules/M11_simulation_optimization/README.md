@@ -14,7 +14,7 @@
 |---|---|
 | Slides | `slides/L37_simopt.tex`, `slides/L38_kriging_surrogate.tex` |
 | Notebooks | `notebooks/L37_simopt.ipynb`, `notebooks/L38_kriging_surrogate.ipynb` |
-| Final project option | `assignment/final_project_simopt_option.md` |
+| Project extension | Optional simulation-optimization extension of the final project (P7): `course/assignments/project_final.pdf` |
 | Reading | `reading.md` |
 
 ## Notes

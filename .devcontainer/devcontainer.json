@@ -1,0 +1,13 @@
+{
+  // Course code (lecture code-alongs in course/modules/*/code, problem-bank code):
+  // Python with simdes. Open this folder in VS Code and choose "Reopen in Container".
+  // Team projects use the project template's own dev container instead.
+  "name": "Simulation course code",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12-bookworm",
+  "postCreateCommand": "pip install --no-cache-dir -e simdes/ pytest ruff ipykernel",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python", "ms-toolsai.jupyter", "charliermarsh.ruff"]
+    }
+  }
+}

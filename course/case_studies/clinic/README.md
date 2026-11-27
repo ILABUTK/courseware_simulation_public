@@ -1,5 +1,9 @@
 # Case Study: Primary Care Clinic
 
+![Mean time in the clinic by number of exam rooms, with 95% confidence intervals](overview.png)
+
+*Default inputs, 30 replications. Can you tell three rooms from four? What would you need to decide?*
+
 This case study is developed progressively across Modules M05–M12.
 
 ## System Description

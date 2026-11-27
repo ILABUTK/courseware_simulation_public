@@ -1,5 +1,9 @@
 # Case Study: Intermodal Container Terminal
 
+![Mean truck time at the terminal by number of gates, with 95% confidence intervals](overview.png)
+
+*Default inputs with two cranes, 30 replications.*
+
 This case study is developed progressively across Modules M05–M12,
 as a parallel track to the clinic case study.
 

@@ -6,7 +6,7 @@ and examination rooms.  Used as the running case study across Modules M05–M12.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any
 
 import numpy as np
@@ -33,11 +33,11 @@ class ClinicParams:
     n_registration: int = 1
     n_nurses: int = 1
     n_exam_rooms: int = 2
-    arrival_rate: float = 5.0 / 60.0   # 5 patients/hour → per minute
+    arrival_rate: float = 5.0 / 60.0  # 5 patients/hour → per minute
     reg_mean: float = 3.0
     triage_mean: float = 8.0
     exam_mean: float = 15.0
-    sim_time: float = 480.0            # 8-hour day
+    sim_time: float = 480.0  # 8-hour day
 
 
 class ClinicModel(BaseModel):
@@ -54,6 +54,8 @@ class ClinicModel(BaseModel):
         >>> "mean_total_time" in result
         True
     """
+
+    time_unit = "min"
 
     def __init__(
         self,
@@ -77,6 +79,9 @@ class ClinicModel(BaseModel):
         registration = simpy.Resource(env, capacity=p.n_registration)
         triage = simpy.Resource(env, capacity=p.n_nurses)
         exam = simpy.Resource(env, capacity=p.n_exam_rooms)
+        self._trace_station("registration", "Registration", p.n_registration)
+        self._trace_station("triage", "Triage nurse", p.n_nurses)
+        self._trace_station("exam", "Exam room", p.n_exam_rooms)
         env.process(self._arrivals(env, rng, registration, triage, exam))
 
     def _arrivals(
@@ -102,28 +107,44 @@ class ClinicModel(BaseModel):
     ) -> Any:
         p = self.params
         t0 = env.now
+        entity = self._new_entity()
+        self._log(entity, "arrive")
 
         # Registration
+        self._log(entity, "queue", "registration")
         with registration.request() as req:
             yield req
+            self._log(entity, "start", "registration")
             self._wait_reg.append(env.now - t0)
             yield env.timeout(rng.exponential(p.reg_mean))
+            self._log(entity, "finish", "registration")
 
         # Triage
         t1 = env.now
+        self._log(entity, "queue", "triage")
         with triage.request() as req:
             yield req
+            self._log(entity, "start", "triage")
             self._wait_triage.append(env.now - t1)
             yield env.timeout(rng.exponential(p.triage_mean))
+            self._log(entity, "finish", "triage")
 
         # Examination
         t2 = env.now
+        self._log(entity, "queue", "exam")
         with exam.request() as req:
             yield req
+            self._log(entity, "start", "exam")
             self._wait_exam.append(env.now - t2)
             yield env.timeout(rng.exponential(p.exam_mean))
+            self._log(entity, "finish", "exam")
 
+        self._log(entity, "depart")
         self._total_times.append(env.now - t0)
+
+    def _trace_params(self) -> dict[str, Any]:
+        """Store the clinic's parameters (a dataclass) in traces."""
+        return asdict(self.params)
 
     def _collect(self) -> dict[str, Any]:
         def _mean(lst: list[float]) -> float:

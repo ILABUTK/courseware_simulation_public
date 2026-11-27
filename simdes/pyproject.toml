@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "simdes"
-version = "0.1.0"
+version = "0.2.1"
 description = "Discrete-event simulation models and analysis tools for 'Simulation Without a Black Box'"
 readme = "README.md"
 license = { text = "MIT" }

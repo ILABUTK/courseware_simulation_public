@@ -1,5 +1,7 @@
 # Case Studies
 
+<img src="clinic/overview.png" alt="Clinic: time in system by exam rooms" width="49%"> <img src="terminal/overview.png" alt="Terminal: time in system by gates" width="49%">
+
 Two parallel, progressively built running examples that thread through
 Modules M05–M12: [`clinic/`](clinic/README.md) (healthcare queueing) and
 [`terminal/`](terminal/README.md) (container-terminal queueing). Instead of a
