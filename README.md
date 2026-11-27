@@ -1,6 +1,6 @@
 # Simulation Without a Black Box — Open Course Materials
 
-**Discrete-Event Modeling and Analysis for the AI Era**
+**Modeling and Simulation in the AI Era**
 
 <p align="center">
   <img src="book/cover.png" alt="Book cover — Simulation Without a Black Box" width="420" />

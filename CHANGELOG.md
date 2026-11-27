@@ -3,8 +3,34 @@
 One entry per tagged release (see `docs/dist_plan.md` §7 for the versioning
 scheme). Newest first.
 
-## Unreleased
+## v0.3.0 — 2026-11-27
 
+The Spring 2027 courseware.
+
+- **Course design:** syllabus for 28 Tue/Thu classes; critical thinking as the main goal, with
+  building a product end to end and AI competency as threads; grading 30/15/25/30; Docker
+  required for students.
+- **Live lectures:** 25 web decks (L01–L25) with speaker notes, 75-minute timing, practice and
+  participation activities, handout and notes PDFs, and lecture code with tests. They replace
+  the Beamer decks, which are being retired.
+- **Course sites:** hosted lectures, a student site with scheduled releases, and an instructor
+  site with class records and release controls. Skill surveys and participation from class logs.
+- **Assessments:** new HW-00–HW-06, participation, team and project handouts (milestones P1–P7),
+  rubrics and answer keys, in LaTeX only; files are named by NetID. The previous assignments,
+  rubrics and solutions were removed.
+- **Grading and repositories:** AI-assisted grading pipeline on anonymized packets
+  (`docs/grading_workflow.md`); the course's own repository script replaces GitHub Classroom,
+  retired in August 2026.
+- **Student project template:** published as its own GitHub template repository.
+- **Showcases:** clinic staffing, driver services office, warehouse, flood evacuation, and the
+  emergency department (EP01) rebuilt on `simdes`.
+- **simdes and simviz:** event traces (`simdes.trace`) and React components that replay them.
+- **Book:** Appendix G (tools for simulation work) with a cheat sheet; ungraded warm-up
+  exercises; corrected exercise statements and solutions.
+- **Problem bank:** 48 chapter problems, including 12 critique-the-AI problems, each with a
+  checked solution. EP02–EP27 capstone solutions are withdrawn until re-verified.
+- **Distribution:** the public package releases course materials by `course/release.json`;
+  `--no-tag` publishes between versions.
 - **Licenses (2026-11-27):** code MIT; course materials CC BY-NC-SA 4.0; book PDF all rights
   reserved (free to read); solutions and rubrics all rights reserved. Replaces the Apache 2.0
   file shipped with earlier releases, which still applies to copies released under it.

@@ -1,6 +1,6 @@
 # simdes
 
-Python companion package for *Simulation Without a Black Box: Discrete-Event Modeling and Analysis for the AI Era*.
+Python companion package for *Simulation Without a Black Box: Modeling and Simulation in the AI Era*.
 
 ## Install
 

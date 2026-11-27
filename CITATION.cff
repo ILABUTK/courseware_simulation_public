@@ -1,12 +1,12 @@
 cff-version: 1.2.0
 message: "If you use this software or course materials, please cite:"
-title: "Simulation Without a Black Box: Discrete-Event Modeling and Analysis for the AI Era"
+title: "Simulation Without a Black Box: Modeling and Simulation in the AI Era"
 authors:
   - family-names: Li
     given-names: Xueping
     affiliation: University of Tennessee, Knoxville
-version: 0.1.1
-date-released: 2026-07-12
+version: 0.3.0
+date-released: 2026-11-27
 repository-code: "https://github.com/ILABUTK/courseware_simulation_public"
 license:
   - CC-BY-NC-SA-4.0
